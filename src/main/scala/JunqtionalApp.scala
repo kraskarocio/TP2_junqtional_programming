@@ -6,6 +6,7 @@ object JunqtionalApp {
   def printJson(json: Json): Unit = {
     println(json)
   }
+  
   def main(args: Array[String]): Unit = {
     if (args.isEmpty) {
       println("ERR: No arguments provided")
