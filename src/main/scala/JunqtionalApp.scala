@@ -78,10 +78,23 @@ object JunqtionalApp {
     }
   searchToDelete(json, keys)
   }
-
+  def exists_key(json: Json, key: String): Boolean = {
+    def searchKey(currentJson: Json): Boolean = {
+      currentJson.asObject match {
+        case Some(obj) =>
+          obj.toMap.exists {
+            case (k, v) if k == key => true
+            case (_, v) => searchKey(v)
+          }
+        case _ => false
+      }
+    }
+    searchKey(json)
+  }
   def main(args: Array[String]): Unit = {
-    val func = "print" // No usamos argumentos de línea de comando
-    val path = "resources/EX1.json" // El archivo JSON está en resource
+// Pongo esto para correrlo desde el Intellij y no mandando arg desde el termina
+    val func = "print"
+    val path = "resources/EX1.json"
     /*
     if (args.isEmpty) {
       println("ERR: No arguments provided")
@@ -112,6 +125,7 @@ object JunqtionalApp {
         updatedJson = delete(updatedJson, "usuario.edad")
         saveJsonToFile(updatedJson, path)
         println(get(updatedJson, "usuarioTriple.nombre"))
+        println(exists_key(updatedJson, "TareasCompletadas"))
   // Hasta aca
 
         // if the JSON is valid, choose which function to run based on the first argument
