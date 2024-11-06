@@ -1,1 +1,9 @@
-[0m[[0m[0mdebug[0m] [0m[0mJar uptodate: /home/kraska/Desktop/TP2_junqtional_programming/target/scala-3.3.4/tp2_junqtional_programming_3-0.1.0-SNAPSHOT.jar[0m
+[0m[[0m[0mdebug[0m] [0m[0mPackaging /home/kraska/Desktop/TP2_junqtional_programming/target/scala-3.3.4/tp2_junqtional_programming_3-0.1.0-SNAPSHOT.jar ...[0m
+[0m[[0m[0mdebug[0m] [0m[0mInput file mappings:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	JunqtionalApp$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/kraska/Desktop/TP2_junqtional_programming/target/scala-3.3.4/classes/JunqtionalApp$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	JunqtionalApp.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/kraska/Desktop/TP2_junqtional_programming/target/scala-3.3.4/classes/JunqtionalApp.tasty[0m
+[0m[[0m[0mdebug[0m] [0m[0m	JunqtionalApp.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/kraska/Desktop/TP2_junqtional_programming/target/scala-3.3.4/classes/JunqtionalApp.class[0m
+[0m[[0m[0mdebug[0m] [0m[0mDone packaging.[0m
