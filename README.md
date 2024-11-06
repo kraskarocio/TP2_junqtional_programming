@@ -1,1 +1,6 @@
-# TP2_junqtional_programming
+## TP2 Junqtional Programming
+
+## Compile & run
+
+`sbt compile`
+`sbt run`
