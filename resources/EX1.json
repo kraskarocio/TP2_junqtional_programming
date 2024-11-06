@@ -1,14 +1,14 @@
 {
-  "usuario": {
-    "nombre": "Juana",
-    "edad": 28
+  "usuario" : {
+    "nombre" : "Juana",
+    "edad" : 5
   },
-  "usuarioDoble": {
-    "nombre": "Ficha",
-    "edad": 22
+  "usuarioDoble" : {
+    "nombre" : "Ficha",
+    "edad" : 22
   },
-  "usuarioTriple": {
-    "nombre": "Justo",
-    "edad": 33
+  "usuarioTriple" : {
+    "nombre" : "Justo",
+    "edad" : 33
   }
 }
