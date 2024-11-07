@@ -5,10 +5,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "TP2_junqtional_programming"
   )
-
-// Dependencias de circe para manejar JSON en Scala 3
-libraryDependencies ++= Seq(
-  "io.circe" %% "circe-core" % "0.14.3",
-  "io.circe" %% "circe-parser" % "0.14.3",
-  "io.circe" %% "circe-generic" % "0.14.3"
-)
+// completar luego ...
+commands += Command.command("junqtional") {
+  "run print resources/EX1.json" :: _
+}

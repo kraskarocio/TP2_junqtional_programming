@@ -1,0 +1,6 @@
+package parser
+
+enum Token {
+  case STRING, NUMBER, BOOLEAN, NULL,
+  L_BRACE, R_BRACE, L_BRACKET, R_BRACKET, COMMA, COLON, EOF
+}

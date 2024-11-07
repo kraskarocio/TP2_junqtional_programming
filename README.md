@@ -2,10 +2,13 @@
 
 ## Compile & run
 
+Valid commands to run the code.
+
 ```bash
-sbt compile
-sbt run
-# example to run with a JSON file
-sbt "run print resources/EX1.json"
-# sbt "run command_name json_file_path"
+# cat JSON_file | scala src/main/scala/JunqtionalApp.scala
+cat resources/EX1.json | scala src/main/scala/JunqtionalApp.scala
+# scala src/main/scala/JunqtionalApp.scala < JSON_file
+scala src/main/scala/JunqtionalApp.scala < resources/EX1.json
+# echo '{"nombre": "Juan", "edad": 30}' | scala src/main/scala/JunqtionalApp.scala
+echo '{"nombre": "Juan", "edad": 30}' | scala src/main/scala/JunqtionalApp.scala
 ```

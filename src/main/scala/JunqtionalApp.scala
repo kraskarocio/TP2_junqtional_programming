@@ -1,64 +1,25 @@
-
-import io.circe.*
-import io.circe.parser.*
-import io.circe.syntax.*
-import io.circe.generic.auto.*
-import scala.io.Source 
+import scala.io.Source
+import scala.util.{Try, Failure, Success}
+import parser._
 
 object JunqtionalApp {
-  def printJson(json: Json): Unit = {
-    println(json)
-  }
 
-  def get(json: Json, path: String): Json = {
-    val keys = path.split("\\.").toList
-    def getSearch(currentJson: Json, keys: List[String]): Json = keys match {
-      case Nil => currentJson
-      case head :: tail =>
-        currentJson.asObject match {
-          case Some(obj) =>
-            obj.toMap.get(head) match {
-              case Some(nextJson) => getSearch(nextJson, tail)
-              case None => Json.Null
-            }
-          case _ => Json.Null
-        }
+  def readFile(): String = {
+    val input = Try(Source.stdin.getLines().mkString("\n")).getOrElse("")
+    if (input.isEmpty) {
+      throw new Exception("ERR: No path found")
     }
-    getSearch(json, keys)
+    input
   }
   def main(args: Array[String]): Unit = {
-    val func = "print" // No usamos argumentos de línea de comando
-    val path = "resources/EX1.json" // El archivo JSON está en resource
-    /*
-    if (args.isEmpty) {
-      println("ERR: No arguments provided")
-      return
-    }
-    val func = args(0) // function to run
-    val path = args(1) // path to JSON file
-          // read JsonFile
+    try {
+      val output = """{"hola": 1}"""
+      val jsonMap = scanner(output)
 
-    */
-
-    val jsonString = try {
-      Source.fromFile(path).mkString
+      // Imprime el mapa resultante
+      println(jsonMap)
     } catch {
-      case e: Exception =>
-        println(s"Error reading the file: ${e.getMessage}")
-        return
-    }
-    val json: Either[ParsingFailure, Json] = parse(jsonString)
-    json match {
-      case Right(parsedJson) =>
-        println(get(parsedJson, "usuarioTriple.nombre"))
-        // if the JSON is valid, choose which function to run based on the first argument
-        func match {
-          case "print" => printJson(parsedJson)
-          // Add more functions here ...
-          case _ => println(s"ERR: Unknown function '$func'")
-        }
-      case Left(error) =>
-        println(s"Error parsing the JSON: $error")
+      case e: Exception => println(e.getMessage)
     }
   }
 }
