@@ -1,22 +1,41 @@
 package parser
 import parser.Token.*
 
-def processTokens(tokens: List[(Token, Any)]): Map[String, Any] = {
-  def helper(tokens: List[(Token, Any)], acc: Map[String, Any]): Map[String, Any] = {
+def processTokens(tokens: List[(Token, Any)]): Any = {
+  // Función auxiliar para procesar objetos en el JSON
+  def helperMap(tokens: List[(Token, Any)], acc: Map[String, Any]): Map[String, Any] = {
     tokens match {
       case (L_BRACE, _) :: rest =>
         val (newAcc, remainingTokens) = processObject(rest, Map())
-        helper(remainingTokens, acc ++ newAcc)
+        helperMap(remainingTokens, acc ++ newAcc)
 
       case (STRING, key: String) :: (COLON, _) :: rest =>
         val (value, nextTokens) = extractValue(rest)
-        helper(nextTokens, acc + (key -> value))
+        helperMap(nextTokens, acc + (key -> value))
 
       case _ =>
         acc
     }
   }
-  helper(tokens, Map())
+
+  // Función auxiliar para procesar listas en el JSON
+  def helperList(tokens: List[(Token, Any)], acc: List[Any]): List[Any] = {
+    tokens match {
+      case (L_BRACKET, _) :: rest =>
+        val (newAcc, remainingTokens) = processArray(rest)
+        helperList(remainingTokens, acc ++ newAcc)
+
+      case _ =>
+        acc
+    }
+  }
+
+  // Determina si es un objeto (Map) o una lista (List) según el primer token
+  tokens match {
+    case (L_BRACE, _) :: _ => helperMap(tokens, Map())
+    case (L_BRACKET, _) :: _ => helperList(tokens, List())
+    case _ => throw new IllegalArgumentException("Expected JSON object or array")
+  }
 }
 
 def extractValue(tokens: List[(Token, Any)]): (Any, List[(Token, Any)]) = {

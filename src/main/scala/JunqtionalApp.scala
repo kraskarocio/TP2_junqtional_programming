@@ -6,8 +6,8 @@ import paths.getPathResult
 object JunqtionalApp {
   def main(args: Array[String]): Unit = {
     try {
-      val option = args(0)
-      val pathFile = args(1)
+      val option = ".[0]|.a"
+      val pathFile = "resources/EX1.json"
       val input = Source.fromFile(pathFile).getLines().mkString
       val mapJson = jsonParser(input)
       println(" - - - - - MAP - - - - -")

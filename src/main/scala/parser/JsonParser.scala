@@ -1,8 +1,9 @@
 package parser
 
 object JsonParser {
-  def jsonParser(input: String): Map[String, Any] = {
+  def jsonParser(input: String):  Any = {
     val tokens = scanner(input)
+    println(tokens)
     val map = processTokens(tokens)
     map
   }
