@@ -2,10 +2,10 @@
 
 ## Compile & run
 
+Valid commands to run the code.
+
 ```bash
-sbt compile
-sbt run
-# example to run with a JSON file
-sbt "run print resources/EX1.json"
-# sbt "run command_name json_file_path"
+# por ahora se ejecuta así
+
+sbt "runMain JunqtionalApp $(cat resources/EX1.json)"
 ```

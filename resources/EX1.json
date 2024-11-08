@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "usuario" : {
     "nombre" : "Juana",
@@ -12,3 +13,6 @@
     "edad" : 33
   }
 }
+=======
+{"usuario": [1, 2]}
+>>>>>>> readJSON
