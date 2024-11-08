@@ -85,13 +85,13 @@ def scanner(input: String): List[(Token, Any)] = {
           val token = getKeyword(input, current)
           token match
             case Some((BOOLEAN, nextIndex)) if input.startsWith("true", current) =>
-              (BOOLEAN, "true", nextIndex)
+              (BOOLEAN, true, nextIndex)
 
             case Some((BOOLEAN, nextIndex)) if input.startsWith("false", current) =>
-              (BOOLEAN, "false", nextIndex)
+              (BOOLEAN, false, nextIndex)
 
             case Some((NULL, nextIndex)) if input.startsWith("null", current) =>
-              (NULL, "null", nextIndex)
+              (NULL, null, nextIndex)
 
             case Some((unknownToken, nextIndex)) =>
               throw new Exception(s"ERR: Unexpected token ${unknownToken}")
