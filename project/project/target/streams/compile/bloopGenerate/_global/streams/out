@@ -1,4 +1,4 @@
-[debug] [tp2_junqtional_programming-build-build] Classpath dependencies List()
-[debug] [tp2_junqtional_programming-build-build] Dependencies from configurations List()
-[debug] Bloop wrote the configuration of project 'tp2_junqtional_programming-build-build' to '/home/kraska/Desktop/TP2_junqtional_programming/project/project/.bloop/tp2_junqtional_programming-build-build.json'
-[success] Generated .bloop/tp2_junqtional_programming-build-build.json
+[0m[[0m[0mdebug[0m] [0m[0m[tp2_junqtional_programming-build-build] Classpath dependencies List()[0m
+[0m[[0m[0mdebug[0m] [0m[0m[tp2_junqtional_programming-build-build] Dependencies from configurations List()[0m
+[0m[[0m[0mdebug[0m] [0m[0mBloop wrote the configuration of project 'tp2_junqtional_programming-build-build' to '/home/kraska/Desktop/TP2_junqtional_programming/project/project/.bloop/tp2_junqtional_programming-build-build.json'[0m
+[0m[[0m[32msuccess[0m] [0m[0mGenerated .bloop/tp2_junqtional_programming-build-build.json[0m

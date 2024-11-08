@@ -5,7 +5,3 @@ lazy val root = (project in file("."))
   .settings(
     name := "TP2_junqtional_programming"
   )
-// completar luego ...
-commands += Command.command("junqtional") {
-  "run print resources/EX1.json" :: _
-}
