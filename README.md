@@ -7,5 +7,5 @@ Valid commands to run the code.
 ```bash
 # por ahora se ejecuta así
 
-sbt "runMain JunqtionalApp $(cat resources/EX1.json)"
+sbt "runMain JunqtionalApp resources/EX1.json"
 ```
