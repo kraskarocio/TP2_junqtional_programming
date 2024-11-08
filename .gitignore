@@ -6,4 +6,6 @@
 .metals/
 .scala-build/
 target/
+project/
+
 
