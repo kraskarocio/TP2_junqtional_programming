@@ -9,13 +9,10 @@ def mapToJsonString(map: Any): String = {
             case s: String => "\"" + s.replace("\"", "\\\"") + "\""
             case n: Number => n.toString
             case b: Boolean => b.toString
-            case l: List[_] => "[" + l.map {
-              case elem: Number => elem.toString
-              case elem => "\"" + elem.toString.replace("\"", "\\\"") + "\""
-            }.mkString(", ") + "]"
+            case l: List[_] => "[" + l.map(mapToJsonString).mkString(", ") + "]"
             case null => "null"
-            case m: Map[_, _] => mapToJsonString(m.asInstanceOf[Map[String, Any]])  // Recursión para Map
-            case _ => "\"" + value.toString.replace("\"", "\\\"") + "\""
+            case nestedMap: Map[_, _] => mapToJsonString(nestedMap.asInstanceOf[Map[String, Any]])
+            case other => "\"" + other.toString.replace("\"", "\\\"") + "\""
           }
           "\"" + key.replace("\"", "\\\"") + "\": " + jsonValue
       }
@@ -27,14 +24,17 @@ def mapToJsonString(map: Any): String = {
         case n: Number => n.toString
         case b: Boolean => b.toString
         case null => "null"
-        case m: Map[_, _] => mapToJsonString(m.asInstanceOf[Map[String, Any]])  // Recursión para Map
-        case l: List[_] => mapToJsonString(l)
-        case _ => "\"" + l.toString.replace("\"", "\\\"") + "\""
+        case m: Map[_, _] => mapToJsonString(m.asInstanceOf[Map[String, Any]])  // Recursion for Map
+        case nestedList: List[_] => mapToJsonString(nestedList)
+        case other => "\"" + other.toString.replace("\"", "\\\"") + "\""
       }
       "[" + jsonParts.mkString(", ") + "]"
 
-    case _ =>
-      "\"" + map.toString.replace("\"", "\\\"") + "\""
+    case s: String => "\"" + s.replace("\"", "\\\"") + "\""
+    case n: Number => n.toString
+    case b: Boolean => b.toString
+    case null => "null"
+    case other => "\"" + other.toString.replace("\"", "\\\"") + "\""
   }
 }
 
