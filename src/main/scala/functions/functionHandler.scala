@@ -1,6 +1,7 @@
 package functions
 import functions.*
 import parser.JsonParser.*
+
 def handler(functionName: String, path: String, value: String, json: Any): Any = {
   functionName match {
     case "map_rec" =>
