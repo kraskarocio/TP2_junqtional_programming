@@ -6,8 +6,8 @@ import mapToJson.mapToJsonString
 object JunqtionalApp {
   def main(args: Array[String]): Unit = {
     try {
-      val option = "map_rec"
-      val func = "sum1"
+      val option = "merge"
+      val func = """[{"d":1},1]"""
       val pathFile = "resources/EX1.json"
       val input = Source.fromFile(pathFile).getLines().mkString
       val mapJson = jsonParser(input)

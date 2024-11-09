@@ -1,6 +1,2 @@
-{
-  "hola":
-  [{"chau" : {"c":  true}}, 9, 10, "hola"],
-  "chau" : "vvv",
-  "bye": false
-}
+
+  [{"chau" : {"c":  true}}, 9, 10, "hola"]

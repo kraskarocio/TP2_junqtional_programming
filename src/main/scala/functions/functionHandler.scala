@@ -1,7 +1,6 @@
 package functions
-import functions.mapRec
 import functions.*
-
+import parser.JsonParser.*
 def handler(functionName: String, path: String, value: String, json: Any): Any = {
   functionName match {
     case "map_rec" =>
@@ -13,7 +12,10 @@ def handler(functionName: String, path: String, value: String, json: Any): Any =
         case "mul2" => mapRec(json, mul2)
         case _ => throw new IllegalArgumentException(s"Unknown transformer: $value")
       }
-
+    case "depth" => depth(json, value.toInt)
+    case "merge" =>
+      val jsonValue = jsonParser(value)
+      merge(json, jsonValue)
     case _ =>
       throw new IllegalArgumentException(s"Unknown function: $functionName")
   }
