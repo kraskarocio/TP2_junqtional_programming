@@ -52,6 +52,10 @@ val input = Source.fromFile(pathFile).getLines().mkString
 [{"chau" : {"c":  true}}, 9, 10, "hola"]
 ```
 ``` scala
+pathFile = "[{"chau" : {"c":  true}}, 9, 10, "hola"]"
+```
+``` scala
+// Output de la función
 List(Map(chau -> Map(c -> true)), 9, 10, hola)
 ```
 ### mapToJson
