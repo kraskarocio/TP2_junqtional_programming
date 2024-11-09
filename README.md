@@ -10,15 +10,8 @@ Valid commands to run the code.
 sbt "runMain JunqtionalApp .f[1] resources/EX1.json"
 ```
 ## paths
-json | opt | result
-
-
-`{ "a" : 1 }` | `.a` | 1
-
-`{ "a" : {"b" : 2} }` | `.a.b` | 2
-
-`{ "a" : {"b" : 2} }` | `.a|.b` | 2
-
-`{ "a" : [10,20] }` | `.a[0]` | 10
-
+| json                     | path           | res |
+|--------------------------|----------------|-----|
+| `{'a':{'b':{'c':0}}}`    | `.a.b.c`       | 0   |
+| `['a':{'b':[1,2,3]}, 1]` | `.[0].a.b.[2]` | 3   |
 

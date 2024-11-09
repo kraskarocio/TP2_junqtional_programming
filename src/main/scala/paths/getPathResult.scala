@@ -1,72 +1,40 @@
 package paths
-import paths.{tokenize, extractTokens, PathToken}
+import paths.{PathToken, extractTokens, tokenize}
 import paths.PathToken.*
 import mapToJson.mapToJsonString
+
+import scala.annotation.tailrec
 
 
 def navigateRecursive(tokens: List[(PathToken, String)], currentJson: Any): Any = tokens match {
 
-  case List((PathToken.DOT, _)) => mapToJsonString(currentJson)
-  case (PathToken.DOT, _) :: (PathToken.STR, key1) :: (PathToken.DOT, _) :: (PathToken.STR, key2) :: nil =>
+  case List((PathToken.DOT, _)) => currentJson
+  case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: rest =>
     currentJson match {
-      case obj: Map[String, Any] =>
-        obj.get(key1) match {
-          case Some(innerObj: Map[String, Any]) =>
-            innerObj.get(key2) match {
-              case Some(value) => removeKeyAndBrackets(mapToJsonString(Map(key2 -> value)))
-            }
+      case list: List[Any] if pos.toInt < list.size =>
+        val nextJson = list(pos.toInt)
+        if(rest.size == 0){
+          return nextJson
         }
+        navigateRecursive(rest, nextJson)
+      case _ => None
     }
-  case (PathToken.DOT, _) :: (PathToken.STR, key1) :: (PathToken.PIPELINE, _) :: (PathToken.DOT, _) :: (PathToken.STR, key2) :: nil =>
-    currentJson match {
-      case obj: Map[String, Any] =>
-        obj.get(key1) match {
-          case Some(innerObj: Map[String, Any]) =>
-            innerObj.get(key2) match {
-              case Some(value) => removeKeyAndBrackets(mapToJsonString(Map(key2 -> value)))
-            }
-        }
-    }
-  case (PathToken.DOT, _) :: (PathToken.STR, key) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: Nil =>
+  case (PathToken.DOT, _) :: (PathToken.STR, key) :: rest =>
     currentJson match {
       case obj: Map[String, Any] =>
         obj.get(key) match {
-          case Some(innerList: List[Any]) =>
-            if (pos.toInt >= 0 && pos.toInt < innerList.size) {
-              val value = innerList(pos.toInt)
-              removeKeyAndBrackets(mapToJsonString(Map(pos -> value)))
+          case Some(json) =>
+            if(rest.size == 0){
+              return json
             }
+            navigateRecursive(rest, json)
+          case None => None
         }
+      case _ => None
     }
-  case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: (PathToken.DOT, _) :: (PathToken.STR, key) :: Nil =>
-    currentJson match {
-      case list: List[Any] =>
-        val value = list(pos.toInt)
-        removeKeyAndBrackets(mapToJsonString(value))
-    }
-
-  case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: (PathToken.PIPELINE, _) :: (PathToken.DOT, _) :: (PathToken.STR, key) :: Nil =>
-    currentJson match {
-      case list: List[Any] =>
-        val value = list(pos.toInt)
-        removeKeyAndBrackets(mapToJsonString(value))
-    }
-
-
-  case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: Nil =>
-    currentJson match {
-      case list: List[Any] =>
-        val value = list(pos.toInt)
-        mapToJsonString(value)
-    }
-  case (PathToken.DOT, _) :: (PathToken.STR, key) :: nil =>
-      currentJson match {
-        case obj: Map[String, Any] =>
-          obj.get(key) match {
-            case Some(value) => removeKeyAndBrackets(mapToJsonString(Map(key -> value)))
-          }
-      }
+  case _ => None
 }
+
 def removeKeyAndBrackets(json: String): String = {
   val withoutBrackets = json.stripPrefix("{").stripSuffix("}")
   def removeKey(string: String): String = {
@@ -80,5 +48,6 @@ def removeKeyAndBrackets(json: String): String = {
 def getPathResult(option: String, json: Any): Any = {
   val tokensValues = tokenize(option)
   println(tokensValues)
-  navigateRecursive(tokensValues, json)
+  mapToJsonString(navigateRecursive(tokensValues, json))
+
 }

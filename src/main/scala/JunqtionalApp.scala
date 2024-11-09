@@ -1,12 +1,11 @@
 import scala.io.Source
 import parser.JsonParser.*
-import mapToJson.mapToJsonString
 import paths.getPathResult
 
 object JunqtionalApp {
   def main(args: Array[String]): Unit = {
     try {
-      val option = ".[0]|.a"
+      val option = ".a.b.c.d.[1]"
       val pathFile = "resources/EX1.json"
       val input = Source.fromFile(pathFile).getLines().mkString
       val mapJson = jsonParser(input)
