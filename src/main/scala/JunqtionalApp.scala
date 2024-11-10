@@ -1,8 +1,8 @@
 import scala.io.Source
 import parser.JsonParser.*
-import paths.*
-import mapToJson.*
-
+import paths.getPathResult
+import functions.handler
+import mapToJson.mapToJsonString
 object JunqtionalApp {
   def get(json: Map[String, Any], path: String): Any = {
     val tokens = tokenize(path)
@@ -73,19 +73,20 @@ object JunqtionalApp {
 
   def main(args: Array[String]): Unit = {
     try {
-      val option = ".a.b.c.d.[1]"
+      val option = "merge"
+      val func = """[{"d":1},1]"""
       val pathFile = "resources/EX1.json"
       val input = Source.fromFile(pathFile).getLines().mkString
       val mapJson = jsonParser(input)
       println(" - - - - - MAP - - - - -")
       println(mapJson)
-
-      var pathRes: Any = null
+      var res: Any = null
       if(option.startsWith(".")){
-        pathRes = getPathResult(option, mapJson)
+        res = getPathResult(option, mapJson)
       }
+      res = mapToJsonString(handler(option, null, func, mapJson))
       println("--- PATH(res) ---")
-      println(pathRes)
+      println(res)
 
 
       println("\n\nPRUEBA DE GET:")

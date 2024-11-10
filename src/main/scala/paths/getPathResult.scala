@@ -3,8 +3,6 @@ import paths.{PathToken, extractTokens, tokenize}
 import paths.PathToken.*
 import mapToJson.mapToJsonString
 
-import scala.annotation.tailrec
-
 
 def navigateRecursive(tokens: List[(PathToken, String)], currentJson: Any): Any = tokens match {
 
@@ -47,7 +45,5 @@ def removeKeyAndBrackets(json: String): String = {
 }
 def getPathResult(option: String, json: Any): Any = {
   val tokensValues = tokenize(option)
-  println(tokensValues)
   mapToJsonString(navigateRecursive(tokensValues, json))
-
 }
