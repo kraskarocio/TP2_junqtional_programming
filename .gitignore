@@ -7,5 +7,5 @@
 .scala-build/
 target/
 project/
-
+.metals/metals.lock.db
 
