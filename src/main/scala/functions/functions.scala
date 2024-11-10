@@ -1,4 +1,8 @@
+
 package functions
+import parser.JsonParser
+import paths.*
+
 /**
  * @param jsonExpr json Map[] List[]
  * @param transformer function that modifies the json
@@ -61,3 +65,45 @@ def merge(jsonExpr: Any, other: Any): Any = (jsonExpr, other) match {
   case _ =>
     throw new IllegalArgumentException("Type of 'other' != 'jsonExpr'")
 }
+
+/**
+ *
+ * @param jsonExpr The JSON data (Map[], List[], etc.).
+ * @param path     The path to navigate through the JSON.
+ * @return The value at the specified path, or null if not found.
+ */
+def get(currentJson: Any, path: String): Any = {
+  val tokens = tokenize(path)
+  navigateRecursive(tokens, currentJson)
+}
+
+
+/**
+ *
+ * @param jsonExpr The JSON data (Map[], List[], etc.).
+ * @param path     The path to check for existence.
+ * @return True if the key exists, false otherwise.
+*/
+
+def existsKey(currentJson: Any, path: String): Boolean = {
+  val tokens = tokenize(path)
+  currentJson match {
+    case obj: Map[String, Any] =>
+      tokens match {
+        case List((PathToken.DOT, _), (PathToken.STR, key)) =>
+          obj.contains(key)
+        case _ => false
+      }
+
+    case list: List[Any] =>
+      tokens match {
+        case List((PathToken.DOT, _), (PathToken.L_BRACE, _), (PathToken.NUM, idx), (PathToken.R_BRACE, _)) if idx.forall(_.isDigit) =>
+          val index = idx.toInt
+          index >= 0 && index < list.size
+        case _ => false
+      }
+
+    case _ => false
+  }
+}
+
