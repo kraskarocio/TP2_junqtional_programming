@@ -1,4 +1,8 @@
 package functions
+import paths.getPathResult
+import parser.JsonParser.*
+
+
 /**
  * @param jsonExpr json Map[] List[]
  * @param transformer function that modifies the json
@@ -61,3 +65,20 @@ def merge(jsonExpr: Any, other: Any): Any = (jsonExpr, other) match {
   case _ =>
     throw new IllegalArgumentException("Type of 'other' != 'jsonExpr'")
 }
+
+
+/**
+ * @param jsonExpr the JSON Expresion that contains the list
+ * @param item    the item to be added
+ * @param path  the path to a list inside of jsonExpr
+ * @return a json merged (jsonExpr + other)
+ */
+//TODO AGREGAR MAS VERIFICACIONES PARA ITEM
+def addItem(jsonExpr: Any, item: Any, path: String): Any =
+  val pathedJson = jsonParser(getPathResult(path, jsonExpr))
+
+  pathedJson match {
+
+    case pathedJson: List[Any] => merge(jsonExpr, pathedJson :+ item)
+    case _ => throw new IllegalArgumentException("The path doesn't reference a List")
+  }
