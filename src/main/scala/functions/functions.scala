@@ -1,6 +1,6 @@
 
 package functions
-import parser.JsonParser
+import parser.*
 import paths.*
 
 /**

@@ -1,6 +1,6 @@
 package functions
 import functions.*
-import parser.JsonParser.jsonParser
+import parser.*
 import paths.{getPathResult, tokenize}
 
 def handler(functionName: String, path: String, value: String, json: Any): Any = {
@@ -17,9 +17,8 @@ def handler(functionName: String, path: String, value: String, json: Any): Any =
     case "depth" => depth(json, value.toInt)
     case "get" => getPathResult(value, json)
     case "delete" =>
-      val tokens = tokenize(value)
-      delete(tokens, json)
-    case "exists_key" => exists_key(json, value)
+      delete(value, json)
+    case "exists_key" => existsKey(json, value)
     case "merge" =>
       val jsonValue = jsonParser(value)
       merge(json, jsonValue)
