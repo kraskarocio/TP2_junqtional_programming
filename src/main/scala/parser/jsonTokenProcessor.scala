@@ -60,8 +60,10 @@ def processObject(tokens: List[(Token, Any)], acc: Map[String, Any]): (Map[Strin
       nextTokens match {
         case (COMMA, _) :: remainingTokens =>
           processObject(remainingTokens, acc + (key -> value))
+        case (R_BRACE, _) :: rest => 
+          (acc + (key -> value), rest)
         case _ =>
-          processObject(nextTokens, acc + (key -> value))
+          throw new Exception("ERR: Expected comma")
       }
     case _ =>
       throw new Exception("ERR: Invalid JSON object format")

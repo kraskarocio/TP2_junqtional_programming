@@ -7,6 +7,21 @@ import mapToJson.mapToJsonString
 def navigateRecursive(tokens: List[(PathToken, String)], currentJson: Any): Any = tokens match {
 
   case List((PathToken.DOT, _)) => currentJson
+  case (PathToken.DOT, _) :: (PathToken.STR, key) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: rest =>
+    currentJson match {
+      case map: Map[String, Any] =>
+        map.get(key) match {
+          case Some(list: List[Any]) if pos.toInt < list.size =>
+            val nextJson = list(pos.toInt)
+            if (rest.isEmpty) {
+              nextJson 
+            } else {
+              navigateRecursive(rest, nextJson) 
+            }
+          case _ => None
+        }
+      case _ => None
+    }
   case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: rest =>
     currentJson match {
       case list: List[Any] if pos.toInt < list.size =>
