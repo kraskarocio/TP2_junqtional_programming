@@ -43,7 +43,7 @@ def removeKeyAndBrackets(json: String): String = {
   }
   removeKey(withoutBrackets)
 }
-def getPathResult(option: String, json: Any): Any = {
+def getPathResult(option: String, json: Any): String = {
   val tokensValues = tokenize(option)
   mapToJsonString(navigateRecursive(tokensValues, json))
 }

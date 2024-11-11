@@ -166,3 +166,21 @@ def delete(path: String, currentJson: Any): Any = {
 
   deleteTokens(tokens, currentJson)
 }
+
+
+
+/**
+ * @param jsonExpr the JSON Expresion that contains the list
+ * @param item    the item to be added
+ * @param path  the path to a list inside of jsonExpr
+ * @return a json merged (jsonExpr + other)
+ */
+//TODO AGREGAR MAS VERIFICACIONES PARA ITEM
+def addItem(jsonExpr: Any, item: Any, path: String): Any =
+  val pathedJson = jsonParser(getPathResult(path, jsonExpr))
+
+  pathedJson match {
+
+    case pathedJson: List[Any] => merge(jsonExpr, pathedJson :+ item)
+    case _ => throw new IllegalArgumentException("The path doesn't reference a List")
+  }
