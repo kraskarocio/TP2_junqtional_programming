@@ -1,7 +1,7 @@
 import scala.io.Source
 import parser.JsonParser.*
 import paths.getPathResult
-import functions.{existsKey, get,  handler}
+import functions.{existsKey, get,  handler, delete}
 import mapToJson.mapToJsonString
 object JunqtionalApp {
   def main(args: Array[String]): Unit = {
@@ -13,22 +13,30 @@ object JunqtionalApp {
       val mapJson = jsonParser(input)
       println(" - - - - - MAP - - - - -")
       println(mapJson)
+
       println("\n--- TESTING EXISTS-KEY ---")
 
-      // Pruebas de existsKey
-      println(s"existsKey(mapJson, \".[0]\"): ${existsKey(mapJson, ".[0]")}") // true
-      println(s"existsKey(mapJson, \".[0].chau\"): ${existsKey(mapJson, ".[0].chau")}") // true
-      println(s"existsKey(mapJson, \".[0].c\"): ${existsKey(mapJson, ".[0].c")}") // false
-      println(s"existsKey(mapJson, \".chau\"): ${existsKey(mapJson, ".chau")}") // false
-      println(s"existsKey(mapJson, \".NonExists\"): ${existsKey(mapJson, ".NonExists")}") // false
+      println(existsKey(mapJson, ".[0]"))
+      println(existsKey(mapJson, ".[0].chau"))
+      println(existsKey(mapJson, ".[0].c"))
+      println(existsKey(mapJson, ".chau"))
+      println(existsKey(mapJson, ".NonExists"))
 
       println("\n--- TESTING GET ---")
 
-      // Pruebas de get
-      println(s"get(mapJson, \".[0].chau.c\"): ${get(mapJson, ".[0].chau.c")}") // true
-      println(s"get(mapJson, \".[1]\"): ${get(mapJson, ".[1]")}") // 9
-      println(s"get(mapJson, \".[3]\"): ${get(mapJson, ".[3]")}") // "hola"
-      println(s"get(mapJson, \".[0].chau\"): ${get(mapJson, ".[0].chau")}") // {"c": true}
+      println(get(mapJson, ".[0].chau.c"))
+      println(get(mapJson, ".[1]"))
+      println(get(mapJson, ".[3]"))
+      println(get(mapJson, ".[0].chau"))
+
+      println("--- TESTING DELETE ---")
+
+      println(delete(".[0].chau.c", mapJson))
+      println(delete(".[1]", mapJson))
+      println(delete(".[3]", mapJson))
+      println(delete(".[0].chau", mapJson))
+
+      println(delete(".[0].NonExists", mapJson))
       /*
       var res: Any = null
       if(option.startsWith(".")){
