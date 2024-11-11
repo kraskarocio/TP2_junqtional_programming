@@ -1,6 +1,6 @@
 package functions
 import functions.*
-import parser.JsonParser.*
+import parser.jsonParser
 
 def handler(functionName: String, path: String, value: String, json: Any): Any = {
   functionName match {

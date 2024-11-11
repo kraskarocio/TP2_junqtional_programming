@@ -1,6 +1,6 @@
 package functions
 import paths.getPathResult
-import parser.JsonParser.*
+import parser.jsonParser
 
 
 /**
