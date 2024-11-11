@@ -1,4 +1,6 @@
+
 package functions
+import parser.JsonParser
 import paths.*
 
 /**
@@ -64,88 +66,103 @@ def merge(jsonExpr: Any, other: Any): Any = (jsonExpr, other) match {
     throw new IllegalArgumentException("Type of 'other' != 'jsonExpr'")
 }
 
-
-def delete(tokens: List[(PathToken, String)], currentJson: Any): Any = tokens match {
-  case Nil => currentJson
-  case (PathToken.DOT, _) :: (PathToken.STR, key) :: Nil =>
-    currentJson match {
-      case obj: Map[String, Any] => obj - key
-      case _ => currentJson
-    }
-  case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: Nil =>
-    currentJson match {
-      case list: List[Any] if pos.toInt < list.size =>
-        val updatedList = list.take(pos.toInt) ++ list.drop(pos.toInt + 1)
-        updatedList
-      case _ => currentJson
-    }
-  case (PathToken.DOT, _) :: (PathToken.STR, key) ::  (PathToken.DOT, _) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: Nil =>
-    currentJson match {
-      case obj: Map[String, Any] =>
-        obj.get(key) match {
-          case Some(list: List[Any]) if pos.toInt < list.size =>
-            val updatedList = list.take(pos.toInt) ++ list.drop(pos.toInt + 1)
-            obj.updated(key, updatedList)
-          case _ => currentJson
-        }
-      case _ => currentJson
-    }
-  case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: (PathToken.DOT, _) :: (PathToken.STR, key) :: Nil =>
-    currentJson match {
-      case list: List[Any] if pos.toInt < list.size =>
-        list(pos.toInt) match {
-          case obj: Map[String, Any] =>
-            val updatedObj = obj - key
-            val updatedList = list.updated(pos.toInt, updatedObj)
-            updatedList
-          case _ => currentJson
-        }
-      case _ => currentJson
-    }
-  case (PathToken.DOT, _) :: (PathToken.STR, key) :: rest =>
-    currentJson match {
-      case obj: Map[String, Any] =>
-        obj.get(key) match {
-          case Some(subJson) =>
-            val updatedSubJson = delete(rest, subJson)
-            obj.updated(key, updatedSubJson)
-          case None => currentJson
-        }
-      case _ => currentJson
-    }
-  case head :: tail =>
-    val newJson = head match {
-      case (PathToken.DOT, _) => currentJson
-      case (PathToken.STR, key) => currentJson match {
-        case obj: Map[String, Any] => obj.get(key).getOrElse(currentJson)
-        case _ => currentJson
-      }
-      case (PathToken.L_BRACE, _) => currentJson match {
-        case list: List[Any] => list
-        case _ => currentJson
-      }
-      case (PathToken.NUM, pos) => currentJson match {
-        case list: List[Any] if pos.toInt < list.size => list(pos.toInt)
-        case _ => currentJson
-      }
-      case _ => currentJson
-    }
-    delete(tail, newJson)
-  case _ => currentJson
+/**
+ * get
+ * 
+ * @param jsonExpr The JSON data (Map[], List[], etc.).
+ * @param path     The path to navigate through the JSON.
+ * @return The value at the specified path, or null if not found.
+ */
+def get(currentJson: Any, path: String): Any = {
+  val tokens = tokenize(path)
+  navigateRecursive(tokens, currentJson)
 }
 
-def exists_key(json: Any, path: String): Boolean = {
-  val keys = path.split("\\.").toList
-  def searchKey(currentJson: Any, keys: List[String]): Boolean = keys match {
+
+/**
+* existsKey
+* 
+* @param jsonExpr The JSON data (Map[], List[], etc.).
+* @param path     The path to check for existence.
+* @return True if the key exists, false otherwise.
+ */
+
+def existsKey(currentJson: Any, path: String): Boolean = {
+  val tokens = tokenize(path)
+  def searchRecursive(tokens: List[(PathToken, String)], currentJson: Any): Boolean = tokens match {
     case Nil => true
-    case head :: tail => currentJson match {
-      case obj: Map[String, Any] =>
-        obj.get(head) match {
-          case Some(nextJson) => searchKey(nextJson, tail)
-          case None => false
-        }
-      case _ => false
-    }
+
+    //acceso .[index]
+    case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, idx) :: (PathToken.R_BRACE, _) :: rest =>
+      currentJson match {
+        case list: List[Any] if idx.forall(_.isDigit) =>
+          val index = idx.toInt
+          if (index >= 0 && index < list.size) {
+            searchRecursive(rest, list(index))
+          } else {
+            false
+          }
+        case _ => false
+      }
+
+    // acceso .key
+    case (PathToken.DOT, _) :: (PathToken.STR, key) :: rest =>
+      currentJson match {
+        case obj: Map[String, Any] =>
+          obj.get(key) match {
+            case Some(nextJson) => searchRecursive(rest, nextJson)
+            case None => false
+          }
+        case _ => false
+      }
+    case _ => false
   }
-  searchKey(json, keys)
+  searchRecursive(tokens, currentJson)
+}
+
+/**
+ * Delete
+ *
+ * @param jsonExpr The JSON data
+ * @param path     The path of the element to delete
+ * @return The updated JSON structure after the deletion. If the path is invalid, returns the original JSON.
+ */
+def delete(path: String, currentJson: Any): Any = {
+  val tokens = tokenize(path)
+
+  def deleteTokens(tokens: List[(PathToken, String)], json: Any): Any = tokens match {
+    case Nil => json
+
+    case (PathToken.DOT, _) :: (PathToken.STR, key) :: Nil =>
+      json match {
+        case obj: Map[String, Any] => obj - key
+        case _ => json
+      }
+
+    case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: Nil =>
+      json match {
+        case list: List[Any] if pos.forall(_.isDigit) && pos.toInt < list.size =>
+          list.take(pos.toInt) ++ list.drop(pos.toInt + 1)
+        case _ => json
+      }
+
+    case (PathToken.DOT, _) :: (PathToken.STR, key) :: rest =>
+      json match {
+        case obj: Map[String, Any] =>
+          obj.get(key).map(subJson => obj.updated(key, deleteTokens(rest, subJson))).getOrElse(json)
+        case _ => json
+      }
+
+    case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: rest =>
+      json match {
+        case list: List[Any] if pos.forall(_.isDigit) && pos.toInt < list.size =>
+          val updatedElement = deleteTokens(rest, list(pos.toInt))
+          list.updated(pos.toInt, updatedElement)
+        case _ => json
+      }
+
+    case _ => json
+  }
+
+  deleteTokens(tokens, currentJson)
 }
