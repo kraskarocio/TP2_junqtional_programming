@@ -82,44 +82,25 @@ def get(currentJson: Any, path: String): Any = {
 /**
 * existsKey
 * 
-* @param jsonExpr The JSON data (Map[], List[], etc.).
-* @param path     The path to check for existence.
+* @param json The JSON data (Map[], List[], etc.).
+* @param key  The key
 * @return True if the key exists, false otherwise.
  */
+def existsKey(json: Any, key: String): Boolean = {
 
-def existsKey(currentJson: Any, path: String): Boolean = {
-  val tokens = tokenize(path)
-  def searchRecursive(tokens: List[(PathToken, String)], currentJson: Any): Boolean = tokens match {
-    case Nil => true
+  def searchKey(currentJson: Any): Boolean = currentJson match {
+    case obj: Map[String, Any] =>
+      if (obj.contains(key)) true
+      else obj.values.exists(searchKey)
 
-    //acceso .[index]
-    case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, idx) :: (PathToken.R_BRACE, _) :: rest =>
-      currentJson match {
-        case list: List[Any] if idx.forall(_.isDigit) =>
-          val index = idx.toInt
-          if (index >= 0 && index < list.size) {
-            searchRecursive(rest, list(index))
-          } else {
-            false
-          }
-        case _ => false
-      }
+    case list: List[Any] =>
+      list.exists(searchKey)
 
-    // acceso .key
-    case (PathToken.DOT, _) :: (PathToken.STR, key) :: rest =>
-      currentJson match {
-        case obj: Map[String, Any] =>
-          obj.get(key) match {
-            case Some(nextJson) => searchRecursive(rest, nextJson)
-            case None => false
-          }
-        case _ => false
-      }
     case _ => false
   }
-  searchRecursive(tokens, currentJson)
-}
 
+  searchKey(json)
+}
 /**
  * Delete
  *
