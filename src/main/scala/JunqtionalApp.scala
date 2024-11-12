@@ -14,14 +14,17 @@ object JunqtionalApp {
     val output = if (args.length > 4) args(4) else null
 
     try {
-      val option = "."
       val input = Source.stdin.getLines().mkString
       val mapJson = jsonParser(input)
-      println(" - - - - - MAP - - - - -")
-      println(mapJson)
-      val res = getPathResult(option, mapJson)
+      var res: Any = null
+      println(arg1)
+      if(command.startsWith(".")){
+        res = getPathResult(command, mapJson)
+      } else {
+        res = handler(command, arg1, arg2, mapJson)
+      }
       println("--- PATH(res) ---")
-      println(res)
+      println(mapToJsonString(res))
     } catch {
       case e: Exception => println(s"Error: ${e.getMessage}")
     }

@@ -24,6 +24,12 @@ echo '{"d":1, "value": 2}' | java -jar target/scala-3.3.4/junqtional-assembly-0.
 ```bash
 java -jar target/scala-3.3.4/junqtional-assembly-0.1.0-SNAPSHOT.jar < resources/EX1.json
 ```
+## Funciones
+### Merge
+```bash
+# ejemplo
+java -jar path_to_jar merge '{"a":1}'
+```
 
 
 ## Directorios
@@ -31,14 +37,13 @@ java -jar target/scala-3.3.4/junqtional-assembly-0.1.0-SNAPSHOT.jar < resources/
 .
  scala
 
-├── JunqtionalApp # el archivo principal, que une los demás
-|  # toma los args dados por el usuario
+├──     JunqtionalApp
 ├── <functions>
 │      ├── functionHandler # acá se maneja el input del ususario
-│      ├── functions # acá es donde tienen que poner sus funciones
-│      └── transformers
+│      ├── functions       # fuciones
+│      └── transformers    # func helpers
 ├── <mapToJson>
-│      └── mapToJson
+│      └── mapToJson       # transforma de un tipo List() o Map() a un Str
 ├── <parser>
 │      ├── JsonParser
 │      ├── jsonTokenProcessor
