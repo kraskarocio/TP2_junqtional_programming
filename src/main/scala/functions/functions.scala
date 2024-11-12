@@ -362,3 +362,24 @@ def flatten(json: Any): List[Any] = {
       throw new Exception("ERR: Expected a 2D List")
   }
 }
+
+def edit(jsonExpr: Any, newValue: Any, path: String): Any =
+
+  val tokens = tokenize(path)
+  tokens match {
+
+    case Nil => throw new IllegalArgumentException("Empty path")
+
+    case List((PathToken.DOT, _)) => throw new IllegalArgumentException("The path doesn't reference to a list Element")
+
+    case (PathToken.DOT, _) :: (PathToken.STR, key) :: rest if rest.nonEmpty => edit(jsonExpr, newValue, rest.toString())
+
+    case (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: Nil =>
+      jsonExpr match {
+        case list: List[Any] if pos.toInt < list.size  => list.updated(pos.toInt, newValue)
+
+        case _ => throw new IllegalArgumentException("The path doesn't reference to a list Element")
+      }
+
+    case _ => throw new IllegalArgumentException("The path doesn't reference to a list Element")
+  }
