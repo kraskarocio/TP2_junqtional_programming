@@ -175,4 +175,118 @@ class AppTestSpec extends AnyFunSuite {
         val tokens = tokenize(".hola[0]")
         assert(navigateRecursive(tokens, recJson) == 2)
     }
+        test("FUNC: [add_key] map"){
+        val json = jsonParser("""{"a":{"b":1}}""")
+        val token = tokenize(".a")
+        val addJson = addKey(token, "c", 1, json)
+        assert(existsKey(addJson, "c"))
+    }
+    test("FUNC: [add_key]  List(Map())") {
+        val json = jsonParser("""[1,2,{"a":0}]""")
+        val token = tokenize(".[2]")
+        val addJson = addKey(token, "c", 1, json)
+        val depJson = depth(addJson, 1)
+        assert(existsKey(addJson, "c"))
+    }
+    test("FUNC: [add_item] list"){
+        val json = jsonParser("""[1,2,{"a":0}]""")
+        val token = tokenize(".")
+        val addJson = addItem(token, List(1,90),json)
+        val depJson = depth(addJson, 2)
+        println(addJson)
+        assert(depJson.contains(90))
+    }
+    test("FUNC: [add_item] Map(List())") {
+        val json = jsonParser("""{"a":[1,2]}""")
+        val token = tokenize(".a")
+        val addJson = addItem(token, List(1, 90), json)
+        val depJson = depth(addJson, 2)
+        println(addJson)
+        assert(depJson.contains(2))
+    }
+    test("FUNC: [mapJson] map") {
+        val json = jsonParser("""{"a":{"v":{"b":0}}, "bool1": true, "bool2": true}""")
+        val mapJson = map_json(json, negateBooleans)
+        val token = tokenize(".bool1")
+        val res = navigateRecursive(token, mapJson)
+        assert(res == false)
+        assert(existsKey(mapJson, "a"))
+    }
+    test("FUNC: [mapJson] list") {
+        val json = jsonParser("""[true, true, {"a":false}]""")
+        val mapJson = map_json(json, negateBooleans)
+        val token = tokenize(".[2].a")
+        val res = navigateRecursive(token, mapJson)
+        val token2 = tokenize(".[1]")
+        val res2 = navigateRecursive(token2, mapJson)
+        assert(res == false)
+        assert(res2 == false)
+    }
+    test("FUNC: [select] map") {
+        val json = jsonParser("""{"a": true, "b": false}""")
+        val selectJson = select_json(json, isTrue)
+        assert(existsKey(selectJson, "a"))
+        assert(!existsKey(selectJson, "b"))
+    }
+    test("FUNC: [select] list") {
+        val json = jsonParser("""[1,2,90,50, true]""")
+        val selectJson = select_json(json, greaterThan10)
+        val resSelectJson = selectJson.asInstanceOf[List[Any]]
+        assert(!resSelectJson.contains(true))
+        assert(resSelectJson.contains(90))
+        assert(!resSelectJson.contains(1))
+    }
+    test("FUNC: [exists_key_rec] Map") {
+        val json = jsonParser("""{"hola":{"todo":{"bien":"?"}}}""")
+        assert(!existsKeyRec(json, "?"))
+        assert(existsKeyRec(json, "todo"))
+        assert(existsKeyRec(json, "bien"))
+        assert(existsKeyRec(json, "hola"))
+    }
+    test("FUNC: [exists_key_rec] List(Map())") {
+        val json = jsonParser("""[1,2,"hola", {"a":{"b":["c", {"d":"e"}]}}]""")
+        assert(!existsKeyRec(json, "e"))
+        assert(!existsKeyRec(json, "hola"))
+        assert(!existsKeyRec(json, "c"))
+        assert(existsKeyRec(json, "a"))
+        assert(existsKeyRec(json, "b"))
+    }
+    test("FUNC: [all] correct"){
+        val json = jsonParser("""[20,30,40,100]""")
+        assert(all(json, greaterThan10))
+    }
+    test("FUNC: [all] incorrect"){
+        val json = jsonParser("""[20,30,true]""")
+        assert(!all(json, greaterThan10))
+    }
+    test("FUNC: [all] doesn't work with Map()"){
+        val json = jsonParser("""{"a": 20, "b": 40}""")
+        assert(!all(json, greaterThan10))
+    }
+    test("FUNC: [flatter]") {
+        val json = jsonParser("""[[1,2],[3,4],[5,6]]""")
+        assert(flatten(json)== List(1,2,3,4,5,6))
+    }
+    test("FUNC: [flatter] List(List(...)List(...))") {
+        val json = jsonParser("""[[{"a":0},{"b":1}],[{"c":2},{"e":1}]]""")
+        assert(flatten(json) == List(Map("a"->0),Map("b"->1), Map("c"-> 2), Map("e"->1)))
+    }
+    test("FUNC: [edit] map") {
+        val json = jsonParser("""{"hola":1, "chao": true}""")
+        val token = tokenize(".chao")
+        val editJson = edit(json, token, false)
+        assert(navigateRecursive(token, editJson) == false)
+    }
+    test("FUNC: [edit] Map(List())") {
+        val json = jsonParser("""{"hola":1, "chao": [1,2,333]}""")
+        val token = tokenize(".chao[2]")
+        val editJson = edit(json, token, 3)
+        assert(navigateRecursive(token, editJson) == 3)
+    }
+    test("FUNC: [edit] List(Map())") {
+        val json = jsonParser("""[1,2,{"a":0}]""")
+        val token = tokenize(".[2].a")
+        val editJson = edit(json, token, "hola")
+        assert(navigateRecursive(token, editJson) == "hola")
+    }
 }
