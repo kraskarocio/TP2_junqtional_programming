@@ -1,8 +1,24 @@
 package parser
 import parser.Token.*
 
+/**
+ * @brief Processes a list of tokens into a JSON-like structure (Map or List).
+ * This function recursively processes a list of tokens and constructs a corresponding 
+ * JSON structure. It distinguishes between objects (Map) and arrays (List) and handles 
+ * them accordingly.
+ * @param tokens The list of tokens to process.
+ * @return A JSON-like structure representing the parsed tokens.
+ */
 def processTokens(tokens: List[(Token, Any)]): Any = {
 
+  /**
+   * @brief Helper function to process object tokens into a Map.
+   * This function processes a list of tokens that represent a JSON object and 
+   * recursively adds key-value pairs to an accumulator Map.
+   * @param tokens The list of tokens to process.
+   * @param acc The accumulator Map that stores key-value pairs.
+   * @return A Map with the parsed key-value pairs and remaining tokens.
+   */
   def helperMap(tokens: List[(Token, Any)], acc: Map[String, Any]): Map[String, Any] = {
     tokens match {
       case (L_BRACE, _) :: rest =>
@@ -18,6 +34,14 @@ def processTokens(tokens: List[(Token, Any)]): Any = {
     }
   }
 
+  /**
+   * @brief Helper function to process array tokens into a List.
+   * This function processes a list of tokens that represent a JSON array and 
+   * recursively adds values to an accumulator List.
+   * @param tokens The list of tokens to process.
+   * @param acc The accumulator List that stores array elements.
+   * @return A List with the parsed elements and remaining tokens.
+   */
   def helperList(tokens: List[(Token, Any)], acc: List[Any]): List[Any] = {
     tokens match {
       case (L_BRACKET, _) :: rest =>
@@ -36,6 +60,13 @@ def processTokens(tokens: List[(Token, Any)]): Any = {
   }
 }
 
+/**
+ * @brief Extracts a value from the token list based on its type.
+ * This function identifies the type of the token (e.g., Number, String, Boolean) 
+ * and extracts the corresponding value, returning it along with the remaining tokens.
+ * @param tokens The list of tokens to extract a value from.
+ * @return A tuple containing the extracted value and the remaining tokens.
+ */
 def extractValue(tokens: List[(Token, Any)]): (Any, List[(Token, Any)]) = {
   tokens match {
     case (NUMBER, value) :: rest => (value, rest)
@@ -52,6 +83,15 @@ def extractValue(tokens: List[(Token, Any)]): (Any, List[(Token, Any)]) = {
   }
 }
 
+/**
+ * @brief Processes a list of tokens into a JSON object (Map).
+ * This function processes tokens that represent a JSON object and recursively 
+ * builds the Map of key-value pairs, handling various token scenarios such as 
+ * commas, braces, and nested objects.
+ * @param tokens The list of tokens to process.
+ * @param acc The accumulator Map for storing key-value pairs.
+ * @return A tuple containing the parsed Map and the remaining tokens.
+ */
 def processObject(tokens: List[(Token, Any)], acc: Map[String, Any]): (Map[String, Any], List[(Token, Any)]) = {
   tokens match {
     case (R_BRACE, _) :: rest => (acc, rest)
@@ -70,6 +110,13 @@ def processObject(tokens: List[(Token, Any)], acc: Map[String, Any]): (Map[Strin
   }
 }
 
+/**
+ * @brief Processes a list of tokens into a JSON array (List).
+ * This function processes tokens that represent a JSON array, recursively 
+ * adding elements to a List until the closing bracket is encountered.
+ * @param tokens The list of tokens to process.
+ * @return A tuple containing the parsed List and the remaining tokens.
+ */
 def processArray(tokens: List[(Token, Any)]): (List[Any], List[(Token, Any)]) = {
   tokens match {
     case (R_BRACKET, _) :: rest => (List(), rest)

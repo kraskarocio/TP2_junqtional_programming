@@ -1,6 +1,11 @@
 package parser
 import Token.*
 
+/**
+* Scanner function that takes a string input and returns a list of tokens and their values.
+* @param input The input string to be scanned.
+* @return A list of tokens and their values.
+*/
 def scanner(input: String): List[(Token, Any)] = {
   def returnCurrent(input: String, current: Int): Char = {
     input.charAt(current)
@@ -16,6 +21,12 @@ def scanner(input: String): List[(Token, Any)] = {
     }
   }
 
+/**
+* @brief Helper function to get a string from the input.
+* @param input The input string to be scanned.
+* @param current The current index in the input string.
+* @return A tuple containing the string and the next index.
+*/
   def getString(input: String, current: Int): (String, Int) = {
     def helper(index: Int, acc: String): (String, Int) = {
       if (index >= input.length || input.charAt(index) == '"') {
@@ -28,6 +39,12 @@ def scanner(input: String): List[(Token, Any)] = {
     helper(current + 1, "")
   }
 
+/**
+* @brief Helper function to get a digit from the input.
+* @param input The input string to be scanned.
+* @param current The current index in the input string.
+* @return A tuple containing the digit and the next index.
+*/
   def getDigit(input: String, current: Int): (Any, Int) = {
     def helper(index: Int, acc: String): (String, Int) = {
       if (index >= input.length || input.charAt(index).isWhitespace || "[},]".contains(input.charAt(index))) {
@@ -44,6 +61,12 @@ def scanner(input: String): List[(Token, Any)] = {
     }
   }
 
+/**
+* @brief Helper function to get a keyword from the input.
+* @param input The input string to be scanned.
+* @param current The current index in the input string.
+* @return A tuple containing the token and the next index.
+*/
   def getKeyword(input: String, current: Int): Option[(Token, Int)] = {
     val keywords = Map("true" -> BOOLEAN, "false" -> BOOLEAN, "null" -> NULL)
 
@@ -58,6 +81,12 @@ def scanner(input: String): List[(Token, Any)] = {
     helper(current, "")
   }
 
+/**
+* @brief Helper function to scan the input string.
+* @param input The input string to be scanned.
+* @param current The current index in the input string.
+* @return A list of tokens and their values.
+*/
   def scan(input: String, current: Int = 0): List[(Token, Any)] = {
     if (current >= input.length) {
       List((EOF, "")) // End of file (EOF) token
