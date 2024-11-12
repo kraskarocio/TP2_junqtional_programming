@@ -52,6 +52,25 @@ def handler(functionName: String, args1: String, args2: String, args3: String, j
     case "add_key" =>
       val tokens = tokenize(args1)
       addKey(tokens, args2, args3, json)
+    case "all" =>
+      args1 match {
+        case "greaterThan10" => all(json, greaterThan10)
+        case "isTrue" => all(json, isTrue)
+        case _ => throw new IllegalArgumentException(s"Unknown condi: $args1")
+      }
+    case "select" =>
+      args1 match {
+        case "greaterThan10" => select_json(json, greaterThan10)
+        case "isTrue" => select_json(json, isTrue)
+        case _ => throw new IllegalArgumentException(s"Unknown condi: $args1")
+      }
+    case "exists_key_rec" =>
+      existsKeyRec(json, args1)
+    case "flatten" =>
+      flatten(json)
+    case "edit" =>
+      val newVal = jsonParser(args2)
+      edit(json, newVal, args1)
     case _ =>
       throw new IllegalArgumentException(s"Unknown function: $functionName")
   }
