@@ -157,11 +157,201 @@ def delete(path: String, currentJson: Any): Any = {
  * @return a json merged (jsonExpr + other)
  */
 //TODO AGREGAR MAS VERIFICACIONES PARA ITEM
-def addItem(jsonExpr: Any, item: Any, path: String): Any =
-  val pathedJson = jsonParser(getPathResult(path, jsonExpr))
+def addItem(path: List[(PathToken, String)], item: Any, currentJson: Any): Any = path match {
+  case Nil =>
+    currentJson match {
+      case list: List[Any] => list :+ item
+      case _ => currentJson
+    }
 
-  pathedJson match {
+  case (PathToken.DOT, _) :: (PathToken.STR, pathKey) :: rest =>
+    currentJson match {
+      case obj: Map[String, Any] =>
+        val updatedSubJson = addItem(rest, item, obj.getOrElse(pathKey, List.empty[Any]))
+        obj.updated(pathKey, updatedSubJson)
+      case _ => currentJson
+    }
 
-    case pathedJson: List[Any] => merge(jsonExpr, pathedJson :+ item)
-    case _ => throw new IllegalArgumentException("The path doesn't reference a List")
+  case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: rest =>
+    currentJson match {
+      case list: List[Any] if pos.toInt < list.size =>
+        val updatedElement = addItem(rest, item, list(pos.toInt))
+        list.updated(pos.toInt, updatedElement)
+      case _ => currentJson
+    }
+
+  case head :: tail =>
+    val newJson = head match {
+      case (PathToken.DOT, _) => currentJson
+      case (PathToken.STR, key) => currentJson match {
+        case obj: Map[String, Any] => obj.getOrElse(key, Map.empty)
+        case _ => currentJson
+      }
+      case (PathToken.L_BRACE, _) => currentJson match {
+        case list: List[Any] => list
+        case _ => currentJson
+      }
+      case (PathToken.NUM, pos) => currentJson match {
+        case list: List[Any] if pos.toInt < list.size => list(pos.toInt)
+        case _ => currentJson
+      }
+      case _ => currentJson
+    }
+    addItem(tail, item, newJson)
+
+  case _ => currentJson
+}
+
+def map_json(json: Any, transformer: Any => Any): Any = {
+
+  json match {
+    case obj: Map[String, Any] =>
+      obj.map { case (key, value) =>
+        key -> transformer(value)
+      }
+
+    case list: List[Any] =>
+      list.map(transformer)
+
+    case other =>
+      transformer(other)
   }
+}
+
+def addKey(path: List[(PathToken, String)], key: String, value: Any, currentJson: Any): Any = path match {
+  case Nil =>
+    currentJson match {
+      case obj: Map[String, Any] => obj + (key -> value)
+      case _ => currentJson
+    }
+  case (PathToken.DOT, _) :: (PathToken.STR, pathKey) :: rest =>
+    currentJson match {
+      case obj: Map[String, Any] =>
+        val updatedSubJson = addKey(rest, key, value, obj.getOrElse(pathKey, Map.empty))
+        obj.updated(pathKey, updatedSubJson)
+      case _ => currentJson
+    }
+  case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: rest =>
+    currentJson match {
+      case list: List[Any] if pos.toInt < list.size =>
+        val updatedElement = addKey(rest, key, value, list(pos.toInt))
+        list.updated(pos.toInt, updatedElement)
+      case _ => currentJson
+    }
+  case head :: tail =>
+    val newJson = head match {
+      case (PathToken.DOT, _) => currentJson
+      case (PathToken.STR, key) => currentJson match {
+        case obj: Map[String, Any] => obj.getOrElse(key, Map.empty)
+        case _ => currentJson
+      }
+      case (PathToken.L_BRACE, _) => currentJson match {
+        case list: List[Any] => list
+        case _ => currentJson
+      }
+      case (PathToken.NUM, pos) => currentJson match {
+        case list: List[Any] if pos.toInt < list.size => list(pos.toInt)
+        case _ => currentJson
+      }
+      case _ => currentJson
+    }
+    addKey(tail, key, value, newJson)
+
+  case _ => currentJson
+}
+
+def all(json: Any, condition: Any => Boolean): Boolean = {
+  json match {
+    case list: List[Any] =>
+      list.forall(condition)
+
+    case _ => false
+  }
+}
+
+def select_json(json: Any, condition: Any => Boolean): Any = {
+  json match {
+    case obj: Map[String, Any] =>
+      obj.filter { case (_, value) => condition(value) }
+
+    case list: List[Any] =>
+      list.filter(condition)
+
+    case _ =>
+      if (condition(json)) json else None
+  }
+}
+def existsKeyRec(json: Any, key: String): Boolean = {
+  json match {
+    case obj: Map[String, Any] =>
+      obj.get(key) match {
+        case Some(_) => true
+        case None =>
+          obj.values.exists(value => existsKeyRec(value, key))
+      }
+
+    case list: List[Any] =>
+      list.exists(value => existsKeyRec(value, key))
+    case _ => false
+  }
+}
+def flatten(json: Any): List[Any] = {
+  json match {
+    case listOfLists: List[List[Any]] =>
+      listOfLists.flatten
+    case _ =>
+      throw new Exception("ERR: Expected a 2D List")
+  }
+}
+
+def edit(json: Any, tokens: List[(PathToken, String)], value: Any): Any = {
+
+  def updateAtPath(currentJson: Any, tokens: List[(PathToken, String)]): Any = tokens match {
+    case Nil => value
+    case (PathToken.DOT, _) :: (PathToken.STR, key) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, idx) :: (PathToken.R_BRACE, _) :: restTokens =>
+      val index = idx.toInt
+      currentJson match {
+        case obj: Map[String, Any] =>
+          obj.get(key) match {
+            case Some(list: List[Any]) if index >= 0 && index < list.size =>
+              val updatedList = list.updated(index, updateAtPath(list(index), restTokens))
+              obj.updated(key, updatedList)
+            case Some(_) =>
+              throw new Exception(s"ERR: index access")
+            case None =>
+              throw new Exception(s"ERR: Key not found")
+          }
+        case _ => throw new Exception("ERR: key[index]")
+      }
+
+    case (PathToken.DOT, _) :: (PathToken.STR, key) :: restTokens =>
+      currentJson match {
+        case obj: Map[String, Any] =>
+          obj.get(key) match {
+            case Some(nextJson) =>
+              obj.updated(key, updateAtPath(nextJson, restTokens))
+            case None =>
+              throw new Exception(s"ERR: Key not found")
+          }
+        case _ => throw new Exception("ERR: access")
+      }
+
+    case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, idx) :: (PathToken.R_BRACE, _) :: restTokens =>
+      val index = idx.toInt
+      currentJson match {
+        case list: List[Any] if index >= 0 && index < list.size =>
+          list.updated(index, updateAtPath(list(index), restTokens))
+        case list: List[Any] =>
+          throw new Exception("ERR: invalid POS")
+        case _ =>
+          throw new Exception("ERR: access")
+      }
+
+
+
+    case _ =>
+      throw new Exception("ERR: Invalid structure")
+  }
+
+  updateAtPath(json, tokens)
+}
