@@ -202,6 +202,13 @@ def addItem(path: List[(PathToken, String)], item: Any, currentJson: Any): Any =
   case _ => currentJson
 }
 
+/**
+  * @brief Function that maps a JSON structure and applies a transformation function to each element.
+  * @param json The JSON data (Map[], List[], etc.).
+  * @param transformer function that modifies the json
+  * @return Map[] or List[] modified
+  */
+**/
 def map_json(json: Any, transformer: Any => Any): Any = {
 
   json match {
@@ -218,6 +225,17 @@ def map_json(json: Any, transformer: Any => Any): Any = {
   }
 }
 
+
+/**
+ * @brief Adds a key-value pair to a nested JSON-like structure based on the provided path. This function recursively traverses the path and updates the value in the JSON object or array.
+ * @param path A list of tuples representing the path to the key in the structure. The path elements are 
+ *             combinations of path tokens like DOT, STR, L_BRACE, NUM, etc.
+ * @param key The key to be added or updated in the structure.
+ * @param value The value associated with the key to be added to the structure.
+ * @param currentJson The current state of the JSON-like structure (could be a Map or List).
+ * @return A new JSON-like structure with the key-value pair added or updated.
+ *         If the path does not match or the structure is incorrect, the original structure is returned.
+ */
 def addKey(path: List[(PathToken, String)], key: String, value: Any, currentJson: Any): Any = path match {
   case Nil =>
     currentJson match {
@@ -260,6 +278,15 @@ def addKey(path: List[(PathToken, String)], key: String, value: Any, currentJson
   case _ => currentJson
 }
 
+
+/**
+ * @brief Checks if all elements in a list satisfy a given condition.
+ * This function iterates over a list and applies the provided condition to each element.
+ * If all elements satisfy the condition, it returns true; otherwise, it returns false.
+ * @param json The input data, expected to be a List.
+ * @param condition A function representing the condition to be checked for each element.
+ * @return True if all elements in the list satisfy the condition, otherwise false.
+ */
 def all(json: Any, condition: Any => Boolean): Boolean = {
   json match {
     case list: List[Any] =>
@@ -268,6 +295,18 @@ def all(json: Any, condition: Any => Boolean): Boolean = {
     case _ => false
   }
 }
+
+/**
+ * @brief Filters elements in a JSON-like structure based on a given condition.
+ * This function recursively checks the elements in the provided JSON structure (Map or List).
+ * If the structure is a Map, it filters key-value pairs based on the condition applied to values.
+ * If the structure is a List, it filters elements based on the condition.
+ * If the structure does not match a Map or List, it checks the condition for the single value.
+ * @param json The input data, which can be a Map, List, or any other type.
+ * @param condition A function representing the condition to be applied to each element.
+ * @return A filtered version of the input JSON-like structure based on the condition.
+ *         If the condition is not met, None is returned for non-iterable types.
+ */
 
 def select_json(json: Any, condition: Any => Boolean): Any = {
   json match {
@@ -281,6 +320,16 @@ def select_json(json: Any, condition: Any => Boolean): Any = {
       if (condition(json)) json else None
   }
 }
+
+/**
+ * @brief Checks if a key exists in a nested JSON-like structure.
+ * This function recursively searches for the specified key in a Map or List. It checks if the key is directly present in a Map, 
+ * or if it exists within any nested structures (Maps or Lists) within the given JSON-like structure.
+ * @param json The input data, which can be a Map, List, or other types.
+ * @param key The key to search for in the structure.
+ * @return True if the key exists in the structure, otherwise false.
+ */
+
 def existsKeyRec(json: Any, key: String): Boolean = {
   json match {
     case obj: Map[String, Any] =>
@@ -295,6 +344,16 @@ def existsKeyRec(json: Any, key: String): Boolean = {
     case _ => false
   }
 }
+
+/**
+ * @brief Flattens a 2D List into a 1D List.
+ * This function takes a 2D List (a list of lists) and combines all the inner lists into a single flat list.
+ * If the input is not a 2D List, it throws an exception.
+ * @param json The input data, expected to be a 2D List.
+ * @return A 1D List containing all elements from the 2D List.
+ * @throws Exception If the input is not a 2D List.
+ */
+
 def flatten(json: Any): List[Any] = {
   json match {
     case listOfLists: List[List[Any]] =>
