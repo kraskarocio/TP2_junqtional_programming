@@ -271,23 +271,18 @@ class AppTestSpec extends AnyFunSuite {
         val json = jsonParser("""[[{"a":0},{"b":1}],[{"c":2},{"e":1}]]""")
         assert(flatten(json) == List(Map("a"->0),Map("b"->1), Map("c"-> 2), Map("e"->1)))
     }
-    test("FUNC: [edit] map") {
-        val json = jsonParser("""{"hola":1, "chao": true}""")
-        val editJson = edit(json, false, ".chao")
+    test("FUNC: [edit] List") {
+        val json = jsonParser("""[[1,2],2,{"a":0}]""")
+        val editJson = edit(json,"hola", ".")
+        val edited = editJson.asInstanceOf[List[Any]]
+        assert(edited.contains("hola"))
+    }
+    test("FUNC: [edit] ") {
+        val json = jsonParser("""{"chao":[1,2]}""")
+        val editJson = edit(json, "hola", ".chao")
         val token = tokenize(".chao")
-        assert(navigateRecursive(token, editJson) == false)
-    }
-    test("FUNC: [edit] Map(List())") {
-        val json = jsonParser("""{"hola":1, "chao": [1,2,333]}""")
-        val editJson = edit(json, 3, ".chao[2]")
-        val token = tokenize(".chao[2]")
-
-        assert(navigateRecursive(token, editJson) == 3)
-    }
-    test("FUNC: [edit] List(Map())") {
-        val json = jsonParser("""[1,2,{"a":0}]""")
-        val editJson = edit(json,"hola", ".[2].a")
-        val token = tokenize(".[2].a")
-        assert(navigateRecursive(token, editJson) == "hola")
+        val aux = navigateRecursive(token, editJson)
+        val aux1 = aux.asInstanceOf[List[Any]]
+        assert(aux1.contains("hello"))
     }
 }

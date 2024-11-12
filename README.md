@@ -24,13 +24,28 @@ echo '{"d":1, "value": 2}' | java -jar target/scala-3.3.4/junqtional-assembly-0.
 ```bash
 java -jar target/scala-3.3.4/junqtional-assembly-0.1.0-SNAPSHOT.jar < resources/EX1.json
 ```
+
 ## Funciones
+
 ### Merge
+
 ```bash
 # ejemplo
 java -jar path_to_jar merge '{"a":1}'
 ```
+### add item
 
+```bash
+# java -jar path_to_jar add_item path jsonList
+java -jar path_to_jar add_item .[1].a '[1,2]'
+```
+_Sí el path no es válido se devuelve sin cambios_
+### add key
+
+```bash
+# java -jar path_to_jar add_key path key value
+java -jar path_to_jar add_key .[3] "b" 1
+```
 
 ## Directorios
 ```bash

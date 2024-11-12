@@ -21,7 +21,7 @@ object JunqtionalApp {
       if(command.startsWith(".")){
         res = getPathResult(command, mapJson)
       } else {
-        res = handler(command, arg1, arg2, mapJson)
+        res = handler(command, arg1, arg2, arg3, mapJson)
       }
       println("--- PATH(res) ---")
       println(mapToJsonString(res))
