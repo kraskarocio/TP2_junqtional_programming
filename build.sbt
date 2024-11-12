@@ -3,6 +3,7 @@ ThisBuild / scalaVersion := "3.3.4"
 
 lazy val root = (project in file("."))
   .settings(
-    name := "TP2_junqtional_programming"
+    name := "junqtional",
   )
+
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.12" % Test

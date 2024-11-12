@@ -207,8 +207,8 @@ def addItem(path: List[(PathToken, String)], item: Any, currentJson: Any): Any =
   * @param json The JSON data (Map[], List[], etc.).
   * @param transformer function that modifies the json
   * @return Map[] or List[] modified
-  */
-**/
+*/
+
 def map_json(json: Any, transformer: Any => Any): Any = {
 
   json match {

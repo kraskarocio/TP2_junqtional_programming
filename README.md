@@ -7,10 +7,25 @@
 ## Compile & run
 *(por ahora esto esta hardcodeado, pero se de debería ejecutar algo así)*
 ```bash
-# por ahora se ejecuta así
-# sbt "runMain JunqtionalApp opt path_to_json"
-sbt "runMain JunqtionalApp .f[1] resources/EX1.json"
+# IMPORTANTE: CORRER ESTO ANTES DE EJECUTAR (y no borrar la carpeta proyect)
+sbt assembly
+
 ```
+
+```bash
+# cat archivo_json | java -jar target/scala-3.3.4/junqtional-assembly-0.1.0-SNAPSHOT.jar
+cat resources/EX1.json | java -jar target/scala-3.3.4/junqtional-assembly-0.1.0-SNAPSHOT.jar
+```
+
+```bash
+echo '{"d":1, "value": 2}' | java -jar target/scala-3.3.4/junqtional-assembly-0.1.0-SNAPSHOT.jar
+```
+
+```bash
+java -jar target/scala-3.3.4/junqtional-assembly-0.1.0-SNAPSHOT.jar < resources/EX1.json
+```
+
+
 ## Directorios
 ```bash
 .
