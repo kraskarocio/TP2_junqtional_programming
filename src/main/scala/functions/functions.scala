@@ -157,49 +157,85 @@ def delete(path: String, currentJson: Any): Any = {
  * @return a json merged (jsonExpr + other)
  */
 //TODO AGREGAR MAS VERIFICACIONES PARA ITEM
-def addItem(path: List[(PathToken, String)], item: Any, currentJson: Any): Any = path match {
-  case Nil =>
-    currentJson match {
-      case list: List[Any] => list :+ item
-      case _ => currentJson
-    }
+// def addItem(path: List[(PathToken, String)], item: Any, currentJson: Any): Any = path match {
+//   case Nil =>
+//     currentJson match {
+//       case list: List[Any] => list :+ item
+//       case _ => currentJson
+//     }
 
-  case (PathToken.DOT, _) :: (PathToken.STR, pathKey) :: rest =>
-    currentJson match {
-      case obj: Map[String, Any] =>
-        val updatedSubJson = addItem(rest, item, obj.getOrElse(pathKey, List.empty[Any]))
-        obj.updated(pathKey, updatedSubJson)
-      case _ => currentJson
-    }
+//   case (PathToken.DOT, _) :: (PathToken.STR, pathKey) :: rest =>
+//     currentJson match {
+//       case obj: Map[String, Any] =>
+//         val updatedSubJson = addItem(rest, item, obj.getOrElse(pathKey, List.empty[Any]))
+//         obj.updated(pathKey, updatedSubJson)
+//       case _ => currentJson
+//     }<  
 
-  case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: rest =>
-    currentJson match {
-      case list: List[Any] if pos.toInt < list.size =>
-        val updatedElement = addItem(rest, item, list(pos.toInt))
-        list.updated(pos.toInt, updatedElement)
-      case _ => currentJson
-    }
+//   case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: rest =>
+//     currentJson match {
+//       case list: List[Any] if pos.toInt < list.size =>
+//         val updatedElement = addItem(rest, item, list(pos.toInt))
+//         list.updated(pos.toInt, updatedElement)
+//       case _ => currentJson
+//     }
 
-  case head :: tail =>
-    val newJson = head match {
-      case (PathToken.DOT, _) => currentJson
-      case (PathToken.STR, key) => currentJson match {
-        case obj: Map[String, Any] => obj.getOrElse(key, Map.empty)
-        case _ => currentJson
+//   case head :: tail =>
+//     val newJson = head match {
+//       case (PathToken.DOT, _) => currentJson
+//       case (PathToken.STR, key) => currentJson match {
+//         case obj: Map[String, Any] => obj.getOrElse(key, Map.empty)
+//         case _ => currentJson
+//       }
+//       case (PathToken.L_BRACE, _) => currentJson match {
+//         case list: List[Any] => list
+//         case _ => currentJson
+//       }
+//       case (PathToken.NUM, pos) => currentJson match {
+//         case list: List[Any] if pos.toInt < list.size => list(pos.toInt)
+//         case _ => currentJson
+//       }
+//       case _ => currentJson
+//     }
+//     addItem(tail, item, newJson)
+
+//   case _ => currentJson
+// }
+
+def addItem(path: List[(PathToken, String)], item: Any, currentJson: Any): Any = {
+  path match {
+    case Nil => 
+      throw new IllegalArgumentException("Error: Path cannot be empty.")
+
+    case (PathToken.DOT, _) :: (PathToken.STR, key) :: rest =>
+      currentJson match {
+        case obj: Map[String, Any] =>
+          val updatedSubJson = obj.get(key) match {
+            case Some(subJson) => addItem(rest, item, subJson)
+            case None => throw new IllegalArgumentException(s"Error: Key '$key' not found.")
+          }
+          obj.updated(key, updatedSubJson)
+        case _ => 
+          throw new IllegalArgumentException("Error: Expected an object at this level.")
       }
-      case (PathToken.L_BRACE, _) => currentJson match {
-        case list: List[Any] => list
-        case _ => currentJson
-      }
-      case (PathToken.NUM, pos) => currentJson match {
-        case list: List[Any] if pos.toInt < list.size => list(pos.toInt)
-        case _ => currentJson
-      }
-      case _ => currentJson
-    }
-    addItem(tail, item, newJson)
 
-  case _ => currentJson
+    case (PathToken.L_BRACE, _) :: (PathToken.NUM, pos) :: (PathToken.R_BRACE, _) :: rest =>
+      currentJson match {
+        case list: List[Any] =>
+          val index = pos.toInt
+          if (index >= 0 && index < list.size) {
+            val updatedElement = addItem(rest, item, list(index))
+            list.updated(index, updatedElement)
+          } else {
+            throw new IllegalArgumentException(s"Error: Index $index out of bounds.")
+          }
+        case _ => 
+          throw new IllegalArgumentException("Error: Expected a list at this level.")
+      }
+
+    case _ => 
+      throw new IllegalArgumentException("Error: Invalid path or structure.")
+  }
 }
 
 /**

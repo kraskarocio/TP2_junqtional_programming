@@ -188,22 +188,39 @@ class AppTestSpec extends AnyFunSuite {
         val depJson = depth(addJson, 1)
         assert(existsKey(addJson, "c"))
     }
-    test("FUNC: [add_item] list"){
-        val json = jsonParser("""[1,2,{"a":0}]""")
-        val token = tokenize(".")
-        val addJson = addItem(token, List(1,90),json)
-        val depJson = depth(addJson, 2)
-        println(addJson)
-        assert(depJson.contains(90))
+    // test("FUNC: [add_item] list"){
+    //     val json = jsonParser("""[1,2,{"a":0}]""")
+    //     val token = tokenize(".")
+    //     val addJson = addItem(token, List(1,90),json)
+    //     val depJson = depth(addJson, 2)
+    //     println(addJson)
+    //     assert(depJson.contains(90))
+    // }
+    // test("FUNC: [add_item] Map(List())") {
+    //     val json = jsonParser("""{"a":[1,2]}""")
+    //     val token = tokenize(".a")
+    //     val addJson = addItem(token, List(1, 90), json)
+    //     val depJson = depth(addJson, 2)
+    //     println(addJson)
+    //     assert(depJson.contains(2))
+    // }
+    test("FUNC: add_item complex case") {
+    val json = jsonParser("""{}""")
+    
+    val addMascotas = addKey(tokenize(".mascotas"), "tortuga", json)
+    assert(existsKey(addMascotas, "mascotas"))
+
+    val addPosicion = addItem(tokenize(".mascotas"), Map("posicion" -> "DEL"), addMascotas)
+    val posicionResult = navigateRecursive(tokenize(".mascotas.posicion"), addPosicion)
+    assert(posicionResult == "DEL")
+
+    val addAlgoRaro = addItem(tokenize(".mascotas"), "algo raro", addPosicion)
+    val algoRaroResult = navigateRecursive(tokenize(".mascotas"), addAlgoRaro)
+    assert(algoRaroResult == "algo raro") 
+
+    println(mapToJsonString(addAlgoRaro))
     }
-    test("FUNC: [add_item] Map(List())") {
-        val json = jsonParser("""{"a":[1,2]}""")
-        val token = tokenize(".a")
-        val addJson = addItem(token, List(1, 90), json)
-        val depJson = depth(addJson, 2)
-        println(addJson)
-        assert(depJson.contains(2))
-    }
+
     test("FUNC: [mapJson] map") {
         val json = jsonParser("""{"a":{"v":{"b":0}}, "bool1": true, "bool2": true}""")
         val mapJson = map_json(json, negateBooleans)
