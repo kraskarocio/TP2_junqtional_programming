@@ -22,7 +22,7 @@ def mapToJsonString(map: Any): String = {
       val jsonParts = l.map(mapToJsonString)
       "[" + jsonParts.mkString(", ") + "]"
 
-    case s: String =>  s.replace("\"", "\\\"")
+    case s: String => " '" + s + "' "
     case n: Number => n.toString
     case b: Boolean => b.toString
     case null => "null"

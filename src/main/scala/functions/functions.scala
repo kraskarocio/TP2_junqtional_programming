@@ -426,7 +426,6 @@ def edit(json: Any, tokens: List[(PathToken, String)], value: Any): Any = {
           throw new Exception("ERR: Key access in non-object")
       }
 
-    // Case: list[index]
     case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) ::
       (PathToken.NUM, idx) :: (PathToken.R_BRACE, _) :: Nil =>
       val index = idx.toInt
@@ -439,7 +438,6 @@ def edit(json: Any, tokens: List[(PathToken, String)], value: Any): Any = {
           throw new Exception("ERR: Index access in non-list")
       }
 
-    // Case: obj.key[index]
     case (PathToken.DOT, _) :: (PathToken.STR, key) ::
       (PathToken.L_BRACE, _) :: (PathToken.NUM, idx) ::
       (PathToken.R_BRACE, _) :: Nil =>
