@@ -418,6 +418,45 @@ def edit(json: Any, tokens: List[(PathToken, String)], value: Any): Any = {
           }
         case _ => throw new Exception("ERR: key[index]")
       }
+    case (PathToken.DOT, _) :: (PathToken.STR, key) :: Nil =>
+      currentJson match {
+        case obj: Map[String, Any] =>
+          obj.updated(key, value)
+        case _ =>
+          throw new Exception("ERR: Key access in non-object")
+      }
+
+    // Case: list[index]
+    case (PathToken.DOT, _) :: (PathToken.L_BRACE, _) ::
+      (PathToken.NUM, idx) :: (PathToken.R_BRACE, _) :: Nil =>
+      val index = idx.toInt
+      currentJson match {
+        case list: List[Any] if index >= 0 && index < list.size =>
+          list.updated(index, value)
+        case list: List[Any] =>
+          throw new Exception("ERR: invalid POS")
+        case _ =>
+          throw new Exception("ERR: Index access in non-list")
+      }
+
+    // Case: obj.key[index]
+    case (PathToken.DOT, _) :: (PathToken.STR, key) ::
+      (PathToken.L_BRACE, _) :: (PathToken.NUM, idx) ::
+      (PathToken.R_BRACE, _) :: Nil =>
+      val index = idx.toInt
+      currentJson match {
+        case obj: Map[String, Any] =>
+          obj.get(key) match {
+            case Some(list: List[Any]) if index >= 0 && index < list.size =>
+              val updatedList = list.updated(index, value)
+              obj.updated(key, updatedList)
+            case Some(_) =>
+              throw new Exception("ERR: index access")
+            case None =>
+              throw new Exception(s"ERR: Key not found")
+          }
+        case _ => throw new Exception("ERR: key[index]")
+      }
 
     case (PathToken.DOT, _) :: (PathToken.STR, key) :: restTokens =>
       currentJson match {

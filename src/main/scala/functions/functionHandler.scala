@@ -70,8 +70,8 @@ def handler(functionName: String, args1: String, args2: String, args3: String, j
       flatten(json)
     case "edit" =>
       val token = tokenize(args1)
-      val newVal = jsonParser(args2)
-      edit(json, token, newVal)
+
+      edit(json, token, args2)
     case _ =>
       throw new IllegalArgumentException(s"Unknown function: $functionName")
   }

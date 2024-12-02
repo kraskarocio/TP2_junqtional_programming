@@ -280,4 +280,11 @@ class AppTestSpec extends AnyFunSuite {
         val edited = editJson.asInstanceOf[List[Any]]
         assert(edited.contains("hola"))
     }
+    test("edit correccion"){
+        val json = jsonParser("""{"nombre": "jose"}""")
+        val token = tokenize(".nombre")
+        val editJson = edit(json, token, "eduardo")
+        val edited = editJson.asInstanceOf[Map[String, Any]]
+        assert(navigateRecursive(token, edited) == "eduardo")
+    }
 }
