@@ -38,7 +38,11 @@ def handler(functionName: String, args1: String, args2: String, args3: String, j
       merge(json, jsonValue)
     case "add_item" =>
       val token = tokenize(args1)
-      val args2Json = jsonParser(args2)
+      val args2Json = try {
+        jsonParser(args2)
+      } catch {
+        case _: Exception => args2
+      }
       addItem(token, args2Json, json)
     case "map" =>
       args1 match {
@@ -70,8 +74,12 @@ def handler(functionName: String, args1: String, args2: String, args3: String, j
       flatten(json)
     case "edit" =>
       val token = tokenize(args1)
-
-      edit(json, token, args2)
+      val args2json =try {
+        jsonParser(args2)
+      } catch {
+        case _: Exception => args2
+      }
+      edit(json, token, args2json)
     case _ =>
       throw new IllegalArgumentException(s"Unknown function: $functionName")
   }
