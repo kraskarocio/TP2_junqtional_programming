@@ -204,6 +204,8 @@ class AppTestSpec extends AnyFunSuite {
         println(addJson)
         assert(depJson.contains(2))
     }
+    
+
     test("FUNC: [mapJson] map") {
         val json = jsonParser("""{"a":{"v":{"b":0}}, "bool1": true, "bool2": true}""")
         val mapJson = map_json(json, negateBooleans)
@@ -277,5 +279,12 @@ class AppTestSpec extends AnyFunSuite {
         val editJson = edit(json,token, "hola")
         val edited = editJson.asInstanceOf[List[Any]]
         assert(edited.contains("hola"))
+    }
+    test("edit correccion"){
+        val json = jsonParser("""{"nombre": "jose"}""")
+        val token = tokenize(".nombre")
+        val editJson = edit(json, token, "eduardo")
+        val edited = editJson.asInstanceOf[Map[String, Any]]
+        assert(navigateRecursive(token, edited) == "eduardo")
     }
 }
